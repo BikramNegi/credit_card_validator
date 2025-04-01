@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import validator from 'validator';
 
 const FormContainer = () => {
   const config = [
@@ -85,6 +86,7 @@ const FormContainer = () => {
   ];
 
   const [formData, setFormData] = useState(config);
+  const [isCreditCard,setIsCreditCard] = useState(false);
 
   const handleChange = (e, index) => {
     let value = e.target.value;
@@ -98,14 +100,25 @@ const FormContainer = () => {
     } else return;
   };
 
+  const handleSubmit = (e) =>{
+    e.preventDefault();
+    const newFormData = new FormData(e.currentTarget);
+    const cardNumber = newFormData.get('number_input')
+    setIsCreditCard(validator.isCreditCard(cardNumber))
+  }
+
   return (
-    <form>
+    <>
+    {isCreditCard ? 'Valid Credit Card' :  'Not a Valid Credit Card'
+    }
+   <form onSubmit={handleSubmit}>
       {formData.map((eachFormItem, index) => (
         <div className="form_group" key={index}>
           <label htmlFor={eachFormItem.name}>{eachFormItem.labelName}</label>
           <input
             type={eachFormItem.type}
             id={eachFormItem.name}
+            name={eachFormItem.name}
             value={eachFormItem.value}
             onChange={(e) => handleChange(e, index)}
           />
@@ -114,7 +127,9 @@ const FormContainer = () => {
           )}
         </div>
       ))}
+      <button type='submit'>Submit</button>
     </form>
+    </>
   );
 };
 
